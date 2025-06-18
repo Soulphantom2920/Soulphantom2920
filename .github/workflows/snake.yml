@@ -1,0 +1,42 @@
+# Nombre del flujo de trabajo de GitHub Actions
+name: Generate Snake Animation
+
+# Controles para cuándo se ejecuta la acción
+on:
+  # Ejecutar automáticamente cada 12 horas
+  schedule:
+    - cron: "0 */12 * * *"
+  
+  # Permite ejecutar este flujo de trabajo manualmente desde la pestaña Acciones
+  workflow_dispatch:
+
+# Un flujo de trabajo se compone de uno o más trabajos que pueden ejecutarse secuencialmente o en paralelo
+jobs:
+  # Este flujo de trabajo contiene un solo trabajo llamado "build"
+  build:
+    # El tipo de máquina en el que se ejecutará el trabajo
+    runs-on: ubuntu-latest
+
+    steps:
+      # Revisa el repositorio para que el trabajo pueda acceder a él
+      - uses: actions/checkout@v2
+
+      # Este es el paso que encontraste. Genera la animación.
+      - name: generate-snake-game-from-github-contribution-grid
+        uses: Platane/snk@v3
+        with:
+          # El nombre de usuario de GitHub del que se obtendrán las contribuciones
+          github_user_name: ${{ github.repository_owner }}
+           # Color de la serpiente
+          color_snake: "#0095b6"
+          # Lista de archivos de salida. La animación se guardará aquí.
+          outputs: dist/snake.svg
+
+      # Sube la animación generada al repositorio
+      - name: push-snake-svg
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: main
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
